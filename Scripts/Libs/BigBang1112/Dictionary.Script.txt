@@ -1,3 +1,30 @@
+/*
+// Dictionary.Script.txt
+// by BigBang1112
+// part of Universe Library Set
+
+// Manage list of terms for translation.
+
+// This library does depend on more libraries from the Universe Library Set:
+// - File.Script.txt
+// You only need to use the libraries above, although it's recommended to use the whole set.
+*/
+
+/*
+// Compatible contexts:
+// - CManiaApp
+// - CMode
+// - CServerPlugin
+*/
+
+/*
+// Void SetTranslationFolder(Text _Folder)
+// Text GetTranslationFolder()
+// Text Get(Text _Definition, Text _Language)
+// Void Set(Text _Definition, Text _Language, Text _Translation)
+// Text TranslateAllPhrases(Text _Source)
+*/
+
 #Include "TextLib" as TextLib
 #Include "Libs/BigBang1112/File.Script.txt" as File
 
@@ -38,6 +65,10 @@ Text Get(Text _Definition, Text _Language) {
 	}
 	
 	return _Definition;
+}
+
+Void Set(Text _Definition, Text _Language, Text _Translation) {
+	G_Dictionaries[_Language][_Definition] = _Translation;
 }
 
 Text TranslateAllPhrases(Text _Source) {
