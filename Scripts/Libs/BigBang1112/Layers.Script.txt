@@ -100,3 +100,11 @@ Void Hide(Text _LayerName) {
 Void SendEvent(Text _LayerName, Text _Type, Text[] _Data) {
 	LayerCustomEvent(Get(_LayerName), _Type, _Data);
 }
+
+Void SendEvent(Text _LayerName, Text _Type, Text _Data) {
+	LayerCustomEvent(Get(_LayerName), _Type, [_Data]);
+}
+
+Void SendEvent(Text _LayerName, Text _Type) {
+	LayerCustomEvent(Get(_LayerName), _Type, []);
+}
