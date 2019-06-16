@@ -14,7 +14,7 @@
 // Compatible contexts:
 // - CManiaApp
 // - CMode
-// - CServerPlugin
+// - CServerPlugin?
 */
 
 /*
