@@ -20,7 +20,7 @@
 
 /*
 // Text RegexReplace(Text _Pattern, Text _Text, Text _Flags, Text _Replacement)
-// Regex replace with _Replacement supporting match insert.
+// Regex replace with _Replacement supporting match insert. Define match group in replacement by \[number] with backslash properly escaped.
 
 // Text _Pattern
 // Text _Text
@@ -37,7 +37,7 @@ Text RegexReplace(Text _Pattern, Text _Text, Text _Flags, Text _Replacement) {
 		declare Matches = TextLib::RegexMatch(_Pattern, Finds[i], _Flags);
 		declare Replacement = _Replacement;
 		for(j,1,Matches.count-1)
-			Replacement = TextLib::Replace(Replacement, "$"^j, Matches[j]);
+			Replacement = TextLib::Replace(Replacement, "\\"^j, Matches[j]);
 		Final = TextLib::Replace(Final, Finds[i], Replacement);
 	}
 
