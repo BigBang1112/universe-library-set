@@ -1,0 +1,7 @@
+Void Info(Text _Name, Text _Content) {
+	log("""[{{{_Name}}}] {{{_Content}}}""");
+}
+
+Void Warn(Text _Name, Text _Content) {
+	log("""[{{{_Name}}}] {{{_Content}}}""");
+}

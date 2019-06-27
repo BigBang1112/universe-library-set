@@ -74,7 +74,7 @@ Boolean AsyncAuthorize(Text _Name, Text _AcceptUrl) {
 SAuthResult GetAsyncAuthorizeResult(Text _Name) {
 	declare SAuthResult Result;
 	
-	if(Http::IsCompleted(_Name)) {
+	if(Http::IsCompleted(_Name, True)) {
 		if(Http::IsSuccessful(_Name)) {
 			Result = Private_Authorize(Http::GetResult(_Name));
 		}

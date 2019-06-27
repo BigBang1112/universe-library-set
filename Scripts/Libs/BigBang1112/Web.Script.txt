@@ -300,6 +300,19 @@ Void AsyncDestroy(Text _Name) {
 }
 
 /*
+// Boolean AsyncIsCompleted(Text _Name, Boolean _NoLog)
+// Checks if the asynchronous request was completed.
+
+// Text _Name - Identification name
+// Boolean _NoLog - If to not inform to the console
+
+// Returns True if the request is completed but not destroyed.
+*/
+Boolean AsyncIsCompleted(Text _Name, Boolean _NoLog) {
+	return Http::IsCompleted(_Name, _NoLog);
+}
+
+/*
 // Boolean AsyncIsCompleted(Text _Name)
 // Checks if the asynchronous request was completed.
 
@@ -308,7 +321,7 @@ Void AsyncDestroy(Text _Name) {
 // Returns True if the request is completed but not destroyed.
 */
 Boolean AsyncIsCompleted(Text _Name) {
-	return Http::IsCompleted(_Name);
+	return AsyncIsCompleted(_Name, False);
 }
 
 /*
@@ -324,6 +337,19 @@ Boolean AsyncIsSuccessful(Text _Name) {
 }
 
 /*
+// Integer AsyncGetStatusCode(Text _Name, Boolean _NoLog)
+// Gets status code of the asynchronous request.
+
+// Text _Name - Identification name
+// Boolean _NoLog - If to not inform to the console
+
+// Returns status code number of a completed request, or 0 if the request is not completed or does not exist.
+*/
+Integer AsyncGetStatusCode(Text _Name, Boolean _NoLog) {
+	return Http::GetStatusCode(_Name, _NoLog);
+}
+
+/*
 // Integer AsyncGetStatusCode(Text _Name)
 // Gets status code of the asynchronous request.
 
@@ -332,9 +358,17 @@ Boolean AsyncIsSuccessful(Text _Name) {
 // Returns status code number of a completed request, or 0 if the request is not completed or does not exist.
 */
 Integer AsyncGetStatusCode(Text _Name) {
-	return Http::GetStatusCode(_Name);
+	return AsyncGetStatusCode(_Name, False);
 }
 
+/*
+// Text AsyncGetResult(Text _Name)
+// Gets result of the asynchronous request.
+
+// Text _Name - Identification name
+
+// Returns result of a completed request, or empty string if the request is not completed or does not exist.
+*/
 Text AsyncGetResult(Text _Name) {
 	return Http::GetResult(_Name);
 }
