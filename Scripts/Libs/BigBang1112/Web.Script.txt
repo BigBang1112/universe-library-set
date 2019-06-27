@@ -148,9 +148,9 @@
 
 Text Private_ToCleanerJson(Text _Json) {
 	declare Final = _Json;
-	declare AllKeys = TextLib::RegexFind("\"(.*?)\":(.*?),",_Json,"g");
+	declare AllKeys = TextLib::RegexFind("\"(.*?)\":(.*?)(,|})",_Json,"g");
 	foreach(Key,AllKeys) {
-		declare PatternPrecise = "\"([a-z])(.*?)\":(.*?),";
+		declare PatternPrecise = "\"([a-z])(.*?)\":(.*?)(,|})";
 		
 		declare MatchFirstLetter = TextLib::RegexMatch(PatternPrecise,Key,"");
 		declare FirstLetter = TextLib::ToUpperCase(MatchFirstLetter[1]);
@@ -163,7 +163,7 @@ Text Private_ToCleanerJson(Text _Json) {
 			FixedRest = TextLib::Replace(FixedRest, InnerFirstLetter, RegexFix::RegexReplace("_([a-z])(.*?)", InnerFirstLetter, "g", FirstInnerLetter^"\\2"));
 		}
 		
-		declare Fixed = RegexFix::RegexReplace(PatternPrecise, Key, "g", "\"" ^ FirstLetter ^ FixedRest ^ "\":\\3,");
+		declare Fixed = RegexFix::RegexReplace(PatternPrecise, Key, "g", "\"" ^ FirstLetter ^ FixedRest ^ "\":\\3\\4");
 		Final = TextLib::Replace(Final,Key,Fixed);
 	}
 	
@@ -277,6 +277,81 @@ SFlashPost[] Flashes(Text _LiveUid) {
 	return Flashes(_LiveUid, 0);
 }
 
+/*
+// CHttpRequest AsyncGet(Text _Name)
+// Gets asynchonous request, completed or pending.
+
+// Text _Name - Identification name
+
+// Returns request that can or cannot be in the progress
+*/
+CHttpRequest AsyncGet(Text _Name) {
+	return Http::Get(_Name);
+}
+
+/*
+// Void AsyncDestroy(Text _Name)
+// Destroys an aynchonous request.
+
+// Text _Name - Identification name
+*/
+Void AsyncDestroy(Text _Name) {
+	Http::Destroy(_Name);
+}
+
+/*
+// Boolean AsyncIsCompleted(Text _Name)
+// Checks if the asynchronous request was completed.
+
+// Text _Name - Identification name
+
+// Returns True if the request is completed but not destroyed.
+*/
+Boolean AsyncIsCompleted(Text _Name) {
+	return Http::IsCompleted(_Name);
+}
+
+/*
+// Boolean AsyncIsSuccessful(Text _Name)
+// Checks if the asynchonous request was completed successfully.
+
+// Text _Name - Identification name
+
+// Returns True if the request is completed with a positive response (between 200 inclusively and 300 exclusively HTTP code).
+*/
+Boolean AsyncIsSuccessful(Text _Name) {
+	return Http::IsSuccessful(_Name);
+}
+
+/*
+// Integer AsyncGetStatusCode(Text _Name)
+// Gets status code of the asynchronous request.
+
+// Text _Name - Identification name
+
+// Returns status code number of a completed request, or 0 if the request is not completed or does not exist.
+*/
+Integer AsyncGetStatusCode(Text _Name) {
+	return Http::GetStatusCode(_Name);
+}
+
+Text AsyncGetResult(Text _Name) {
+	return Http::GetResult(_Name);
+}
+
 Boolean AsyncMeMaps(Text _Name, Text _Token) {
 	return Http::AsyncGET(_Name, "https://maniaplanet.com/webservices/me/maps", False, "Authorization: Bearer "^_Token);
+}
+
+SMap[] GetAsyncMeMapsResult(Text _Name) {
+	declare SMap[] Result;
+	
+	if(AsyncIsCompleted(_Name)) {
+		if(AsyncIsSuccessful(_Name)) {
+			declare JsonSuccess = Result.fromjson(Private_ToCleanerJson(AsyncGetResult(_Name)));
+			System.ClipboardSet(Private_ToCleanerJson(AsyncGetResult(_Name)));
+		}
+		AsyncDestroy(_Name);
+	}
+	return Result;
 }
