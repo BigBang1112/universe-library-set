@@ -20,26 +20,35 @@
 */
 
 /*
+// CHttpRequest SyncGET(Text _Url, Boolean _UseCache, Text _AdditionalHeaders, Boolean _NoLog)
 // CHttpRequest SyncGET(Text _Url, Boolean _UseCache, Text _AdditionalHeaders)
 // CHttpRequest SyncGET(Text _Url, Boolean _UseCache)
 // CHttpRequest SyncGET(Text _Url)
+// Text SyncGET_Result(Text _Url, Boolean _UseCache, Text _AdditionalHeaders, Boolean _NoLog)
 // Text SyncGET_Result(Text _Url, Boolean _UseCache, Text _AdditionalHeaders)
 // Text SyncGET_Result(Text _Url, Boolean _UseCache)
 // Text SyncGET_Result(Text _Url)
+// CHttpRequest SyncPOST(Text _Url, Text _Resource, Text _AdditionalHeaders, Boolean _NoLog)
 // CHttpRequest SyncPOST(Text _Url, Text _Resource, Text _AdditionalHeaders)
 // CHttpRequest SyncPOST(Text _Url, Text _Resource)
+// Text SyncPOST_Result(Text _Url, Text _Resource, Text _AdditionalHeaders, Boolean _NoLog)
 // Text SyncPOST_Result(Text _Url, Text _Resource, Text _AdditionalHeaders)
 // Text SyncPOST_Result(Text _Url, Text _Resource)
+// CHttpRequest SyncPOSTFile(Text _Url, Text _FileName, Text _AdditionalHeaders, Boolean _NoLog)
 // CHttpRequest SyncPOSTFile(Text _Url, Text _FileName, Text _AdditionalHeaders)
 // CHttpRequest SyncPOSTFile(Text _Url, Text _FileName)
+// Text SyncPOSTFile_Result(Text _Url, Text _FileName, Text _AdditionalHeaders, Boolean _NoLog)
 // Text SyncPOSTFile_Result(Text _Url, Text _FileName, Text _AdditionalHeaders)
 // Text SyncPOSTFile_Result(Text _Url, Text _FileName)
 
+// Boolean AsyncGET(Text _Name, Text _Url, Boolean _UseCache, Text _AdditionalHeaders, Boolean _NoLog)
 // Boolean AsyncGET(Text _Name, Text _Url, Boolean _UseCache, Text _AdditionalHeaders)
 // Boolean AsyncGET(Text _Name, Text _Url, Boolean _UseCache)
 // Boolean AsyncGET(Text _Name, Text _Url)
+// Boolean AsyncPOST(Text _Name, Text _Url, Text _Resource, Text _AdditionalHeaders, Boolean _NoLog)
 // Boolean AsyncPOST(Text _Name, Text _Url, Text _Resource, Text _AdditionalHeaders)
 // Boolean AsyncPOST(Text _Name, Text _Url, Text _Resource)
+// Boolean AsyncPOSTFile(Text _Name, Text _Url, Text _FileName, Text _AdditionalHeaders, Boolean _NoLog)
 // Boolean AsyncPOSTFile(Text _Name, Text _Url, Text _FileName, Text _AdditionalHeaders)
 // Boolean AsyncPOSTFile(Text _Name, Text _Url, Text _FileName)
 
@@ -51,9 +60,14 @@
 
 #Include "Libs/BigBang1112/Log.Script.txt" as Log
 
+#Struct SRequest {
+	Integer Timestamp;
+	Ident Request;
+}
+
 #Const C_StatusCode_Offline 10006
 
-declare Ident[Text] G_Requests;
+declare SRequest[Text] G_Requests;
 
 /*
 // CHttpRequest SyncGET(Text _Url, Boolean _UseCache, Text _AdditionalHeaders, Boolean _NoLog)
@@ -324,8 +338,13 @@ Boolean AsyncGET(Text _Name, Text _Url, Boolean _UseCache, Text _AdditionalHeade
 	
 	if(!_NoLog) Log::Info("HTTP", "Async requesting GET: " ^ _Url ^ """ ({{{_Name}}})""");
 	
-	if(G_Requests.existskey(_Name)) Http.Destroy(Http.Requests[G_Requests[_Name]]);
-	G_Requests[_Name] = Http.CreateGet(_Url, _UseCache, _AdditionalHeaders).Id;
+	if(G_Requests.existskey(_Name)) Http.Destroy(Http.Requests[G_Requests[_Name].Request]);
+	
+	declare SRequest R;
+	R.Timestamp = Now;
+	R.Request = Http.CreateGet(_Url, _UseCache, _AdditionalHeaders).Id;
+	G_Requests[_Name] = R;
+	
 	return True;
 }
 
@@ -377,9 +396,12 @@ Boolean AsyncPOST(Text _Name, Text _Url, Text _Resource, Text _AdditionalHeaders
 	
 	if(!_NoLog) Log::Info("HTTP", "Async requesting POST: " ^ _Url ^ """ ({{{_Name}}})""");
 	
-	if(G_Requests.existskey(_Name)) Http.Destroy(Http.Requests[G_Requests[_Name]]);
+	if(G_Requests.existskey(_Name)) Http.Destroy(Http.Requests[G_Requests[_Name].Request]);
 	
-	G_Requests[_Name] = Http.CreatePost(_Url, _Resource, _AdditionalHeaders).Id;
+	declare SRequest R;
+	R.Timestamp = Now;
+	R.Request = Http.CreatePost(_Url, _Resource, _AdditionalHeaders).Id;
+	G_Requests[_Name] = R;
 
 	return True;
 }
@@ -419,9 +441,12 @@ Boolean AsyncPOSTFile(Text _Name, Text _Url, Text _FileName, Text _AdditionalHea
 	
 	if(!_NoLog) Log::Info("HTTP", "requesting POST FILE: " ^ _Url ^ """ ({{{_Name}}})""");
 	
-	if(G_Requests.existskey(_Name)) Http.Destroy(Http.Requests[G_Requests[_Name]]);
+	if(G_Requests.existskey(_Name)) Http.Destroy(Http.Requests[G_Requests[_Name].Request]);
 	
-	G_Requests[_Name] = Http.CreatePostFile(_Url, _FileName, _AdditionalHeaders).Id;
+	declare SRequest R;
+	R.Timestamp = Now;
+	R.Request = Http.CreatePostFile(_Url, _FileName, _AdditionalHeaders).Id;
+	G_Requests[_Name] = R;
 
 	return True;
 }
@@ -450,7 +475,7 @@ Boolean AsyncPOSTFile(Text _Name, Text _Url, Text _FileName) {
 */
 CHttpRequest Get(Text _Name) {
 	if(!G_Requests.existskey(_Name)) return Null;
-	return Http.Requests[G_Requests[_Name]];
+	return Http.Requests[G_Requests[_Name].Request];
 }
 
 /*
@@ -461,7 +486,7 @@ CHttpRequest Get(Text _Name) {
 */
 Void Destroy(Text _Name) {
 	if(!G_Requests.existskey(_Name)) return;
-	Http.Destroy(Http.Requests[G_Requests[_Name]]);
+	Http.Destroy(Http.Requests[G_Requests[_Name].Request]);
 	declare Removed = G_Requests.removekey(_Name);
 }
 
@@ -477,8 +502,9 @@ Void Destroy(Text _Name) {
 Boolean IsCompleted(Text _Name, Boolean _NoLog) {
 	if(!G_Requests.existskey(_Name)) return False;
 	declare IsCompleted = Get(_Name).IsCompleted;
+	declare Time = Now - G_Requests[_Name].Timestamp;
 	if(IsCompleted && !_NoLog)
-		Log::Info("HTTP", "Async request completed" ^ """ ({{{_Name}}})""");
+		Log::Info("HTTP", "Async request completed" ^ """ ({{{_Name}}})""", Time);
 	return IsCompleted;
 }
 
