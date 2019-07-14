@@ -373,6 +373,51 @@ Text AsyncGetResult(Text _Name) {
 	return Http::GetResult(_Name);
 }
 
+Boolean AsyncMe(Text _Name, Text _Token) {
+	return Http::AsyncGET(_Name, "https://maniaplanet.com/webservices/me", False, "Authorization: Bearer "^_Token);
+}
+
+SPlayer GetAsyncMeResult(Text _Name) {
+	declare SPlayer Result;
+	
+	if(AsyncIsCompleted(_Name, True)) {
+		if(AsyncIsSuccessful(_Name))
+			declare JsonSuccess = Result.fromjson(Private_ToCleanerJson(AsyncGetResult(_Name)));
+		AsyncDestroy(_Name);
+	}
+	return Result;
+}
+
+Boolean AsyncMeTitlesCreated(Text _Name, Text _Token) {
+	return Http::AsyncGET(_Name, "https://maniaplanet.com/webservices/me/titles/created", False, "Authorization: Bearer "^_Token);
+}
+
+STitle[] GetAsyncMeTitlesCreatedResult(Text _Name) {
+	declare STitle[] Result;
+	
+	if(AsyncIsCompleted(_Name, True)) {
+		if(AsyncIsSuccessful(_Name))
+			declare JsonSuccess = Result.fromjson(Private_ToCleanerJson(AsyncGetResult(_Name)));
+		AsyncDestroy(_Name);
+	}
+	return Result;
+}
+
+Boolean AsyncMeDedicated(Text _Name, Text _Token) {
+	return Http::AsyncGET(_Name, "https://maniaplanet.com/webservices/me/titles/dedicated", False, "Authorization: Bearer "^_Token);
+}
+
+SDedicatedAccount[] GetAsyncMeDedicatedResult(Text _Name) {
+	declare SDedicatedAccount[] Result;
+	
+	if(AsyncIsCompleted(_Name, True)) {
+		if(AsyncIsSuccessful(_Name))
+			declare JsonSuccess = Result.fromjson(Private_ToCleanerJson(AsyncGetResult(_Name)));
+		AsyncDestroy(_Name);
+	}
+	return Result;
+}
+
 Boolean AsyncMeMaps(Text _Name, Text _Token) {
 	return Http::AsyncGET(_Name, "https://maniaplanet.com/webservices/me/maps", False, "Authorization: Bearer "^_Token);
 }
@@ -381,9 +426,23 @@ SMap[] GetAsyncMeMapsResult(Text _Name) {
 	declare SMap[] Result;
 	
 	if(AsyncIsCompleted(_Name, True)) {
-		if(AsyncIsSuccessful(_Name)) {
+		if(AsyncIsSuccessful(_Name))
 			declare JsonSuccess = Result.fromjson(Private_ToCleanerJson(AsyncGetResult(_Name)));
-		}
+		AsyncDestroy(_Name);
+	}
+	return Result;
+}
+
+Boolean AsyncMeEmail(Text _Name, Text _Token) {
+	return Http::AsyncGET(_Name, "https://maniaplanet.com/webservices/me/email", False, "Authorization: Bearer "^_Token);
+}
+
+Text GetAsyncMeEmailResult(Text _Name) {
+	declare Text Result;
+	
+	if(AsyncIsCompleted(_Name, True)) {
+		if(AsyncIsSuccessful(_Name))
+			Result = AsyncGetResult(_Name));
 		AsyncDestroy(_Name);
 	}
 	return Result;
@@ -397,9 +456,100 @@ SMap GetAsyncMapResult(Text _Name) {
 	declare SMap Result;
 	
 	if(AsyncIsCompleted(_Name, True)) {
-		if(AsyncIsSuccessful(_Name)) {
+		if(AsyncIsSuccessful(_Name))
 			declare JsonSuccess = Result.fromjson(Private_ToCleanerJson(AsyncGetResult(_Name)));
-		}
+		AsyncDestroy(_Name);
+	}
+	return Result;
+}
+
+Boolean AsyncZones(Text _Name) {
+	return Http::AsyncGET(_Name, "https://maniaplanet.com/webservices/zones");
+}
+
+SZone[] GetAsyncZonesResult(Text _Name) {
+	declare SZone[] Result;
+	
+	if(AsyncIsCompleted(_Name, True)) {
+		if(AsyncIsSuccessful(_Name))
+			declare JsonSuccess = Result.fromjson(Private_ToCleanerJson(AsyncGetResult(_Name)));
+		AsyncDestroy(_Name);
+	}
+	return Result;
+}
+
+Boolean AsyncTitles(Text _Name, Text[] _Filters, Text _OrderBy, Integer _Offset, Integer Length) {
+	return False;
+}
+
+Boolean AsyncTitles(Text _Name, Text[] _Filters, Text _OrderBy, Integer _Offset) {
+	return AsyncTitles(_Name, _Filters, _OrderBy, _Offset, 10);
+}
+
+Boolean AsyncTitles(Text _Name, Text[] _Filters, Text _OrderBy) {
+	return AsyncTitles(_Name, _Filters, _OrderBy, 0);
+}
+
+Boolean AsyncTitles(Text _Name, Text[] _Filters) {
+	return AsyncTitles(_Name, _Filters, "onlinePlayers");
+}
+
+Boolean AsyncTitles(Text _Name) {
+	return AsyncTitles(_Name, []);
+}
+
+Boolean AsyncTitle(Text _Name, Text _Uid) {
+	return Http::AsyncGET(_Name, "https://maniaplanet.com/webservices/titles/"^_Uid);
+}
+
+STitle GetAsyncTitleResult(Text _Name) {
+	declare STitle Result;
+	
+	if(AsyncIsCompleted(_Name, True)) {
+		if(AsyncIsSuccessful(_Name))
+			declare JsonSuccess = Result.fromjson(Private_ToCleanerJson(AsyncGetResult(_Name)));
+		AsyncDestroy(_Name);
+	}
+	return Result;
+}
+
+Boolean AsyncTitleScripts(Text _Name, Text _Uid) {
+	return Http::AsyncGET(_Name, "https://maniaplanet.com/webservices/titles/"^_Uid^"/scripts");
+}
+
+STitleScript[] GetAsyncTitleScriptsResult(Text _Name) {
+	declare STitleScript[] Result;
+	
+	if(AsyncIsCompleted(_Name, True)) {
+		if(AsyncIsSuccessful(_Name))
+			declare JsonSuccess = Result.fromjson(Private_ToCleanerJson(AsyncGetResult(_Name)));
+		AsyncDestroy(_Name);
+	}
+	return Result;
+}
+
+Boolean AsyncServers(Text _Name, SServerFilter _Filter) {
+	return False;
+}
+
+Boolean AsyncFlashes(Text _Name, Text _LiveUid, Integer _Offset, Integer _Length) {
+	return Http::AsyncGET("""https://maniaplanet.com/webservices/flashes/post/{{{_LiveUid}}}?offset={{{_Offset}}}&length={{{_Length}}}""");
+}
+
+Boolean AsyncFlashes(Text _Name, Text _LiveUid, Integer _Offset) {
+	return AsyncFlashes(_Name, _LiveUid, _Offset, 10);
+}
+
+Boolean AsyncFlashes(Text _Name, Text _LiveUid) {
+	return AsyncFlashes(_Name, _LiveUid, 0);
+}
+
+SFlashPost[] GetAsyncFlashesResult(Text _Name) {
+	declare SFlashPost[] Result;
+	
+	if(AsyncIsCompleted(_Name, True)) {
+		if(AsyncIsSuccessful(_Name))
+			declare JsonSuccess = Result.fromjson(Private_ToCleanerJson(AsyncGetResult(_Name)));
 		AsyncDestroy(_Name);
 	}
 	return Result;
