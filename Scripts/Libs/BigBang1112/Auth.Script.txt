@@ -127,7 +127,7 @@ SAuthToken GetNewToken() {
 		Token.Response = C_Response_Successful;
 		Token.Time = TimeEnd - TimeStart;
 		Token.EndTime = TimeEnd;
-		Token.Expires = Now+Token.Length;
+		Token.Expires = TimeEnd+Token.Length;
 	}
 	else if(Authentication_ErrorCode == 10006) {
 		Token.Response = C_Response_Offline;
@@ -277,7 +277,7 @@ Void Start() {
 
 Void Loop() {
 	if(Auth_Token.Successful) {
-		if(Now >= Auth_Token.EndTime + Auth_Token.Length) {
+		if(Now >= Auth_Token.Expires) {
 			declare Token = GetNewToken();
 			log("[Auth.Script.txt] New automatic token: "^Token.Value);
 		}
