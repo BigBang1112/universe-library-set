@@ -262,6 +262,7 @@ CHttpRequest SyncPOSTFile(Text _Url, Text _FileName, Text _AdditionalHeaders, Bo
 	if(!_NoLog) Log::Info("HTTP", "Sync requesting POST FILE: " ^ _Url);
 	
 	declare Request = Http.CreatePostFile(_Url, _FileName, _AdditionalHeaders);
+	if(Request == Null) return Request;
 	wait(Request.IsCompleted);
 	return Request;
 }
