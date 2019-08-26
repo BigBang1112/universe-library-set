@@ -146,55 +146,31 @@
 	Integer Length;
 }
 
-Text Private_ToCleanerJson(Text _Json) {
-	declare Final = _Json;
-	declare AllKeys = TextLib::RegexFind("\"(.*?)\":(.*?)(,|})",_Json,"g");
-	foreach(Key,AllKeys) {
-		declare PatternPrecise = "\"([a-z])(.*?)\":(.*?)(,|})";
-		
-		declare MatchFirstLetter = TextLib::RegexMatch(PatternPrecise,Key,"");
-		declare FirstLetter = TextLib::ToUpperCase(MatchFirstLetter[1]);
-		
-		declare FixedRest = MatchFirstLetter[2];
-		declare FindInnerFirstLetters = TextLib::RegexFind("_([a-z])(.*?)",FixedRest,"g");
-		foreach(InnerFirstLetter, FindInnerFirstLetters) {
-			declare MatchInnerFirstLetters = TextLib::RegexMatch("_([a-z])(.*?)",InnerFirstLetter,"");
-			declare FirstInnerLetter = TextLib::ToUpperCase(MatchInnerFirstLetters[1]);
-			FixedRest = TextLib::Replace(FixedRest, InnerFirstLetter, RegexFix::RegexReplace("_([a-z])(.*?)", InnerFirstLetter, "g", FirstInnerLetter^"\\2"));
-		}
-		
-		declare Fixed = RegexFix::RegexReplace(PatternPrecise, Key, "g", "\"" ^ FirstLetter ^ FixedRest ^ "\":\\3\\4");
-		Final = TextLib::Replace(Final,Key,Fixed);
-	}
-	
-	return Final;
-}
-
 SPlayer Me(Text _Token) {
 	declare Result = Http::SyncGET_Result("https://maniaplanet.com/webservices/me", False, "Authorization: Bearer "^_Token);
 	declare SPlayer Player;
-	declare JsonSuccess = Player.fromjson(Private_ToCleanerJson(Result));
+	declare JsonSuccess = Player.fromjson(RegexFix::ToCleanerJson(Result));
 	return Player;
 }
 
 STitle[] MeTitlesCreated(Text _Token) {
 	declare Result = Http::SyncGET_Result("https://maniaplanet.com/webservices/me/titles/created", False, "Authorization: Bearer "^_Token);
 	declare STitle[] Titles;
-	declare JsonSuccess = Titles.fromjson(Private_ToCleanerJson(Result));
+	declare JsonSuccess = Titles.fromjson(RegexFix::ToCleanerJson(Result));
 	return Titles;
 }
 
 SDedicatedAccount[] MeDedicated(Text _Token) {
 	declare Result = Http::SyncGET_Result("https://maniaplanet.com/webservices/me/titles/dedicated", False, "Authorization: Bearer "^_Token);
 	declare SDedicatedAccount[] Accounts;
-	declare JsonSuccess = Accounts.fromjson(Private_ToCleanerJson(Result));
+	declare JsonSuccess = Accounts.fromjson(RegexFix::ToCleanerJson(Result));
 	return Accounts;
 }
 
 SMap[] MeMaps(Text _Token) {
 	declare Result = Http::SyncGET_Result("https://maniaplanet.com/webservices/me/maps", False, "Authorization: Bearer "^_Token);
 	declare SMap[] Maps;
-	declare JsonSuccess = Maps.fromjson(Private_ToCleanerJson(Result));
+	declare JsonSuccess = Maps.fromjson(RegexFix::ToCleanerJson(Result));
 	return Maps;
 }
 
@@ -207,14 +183,14 @@ Text MeEmail(Text _Token) {
 SMap Map(Text _Uid) {
 	declare Result = Http::SyncGET_Result("https://maniaplanet.com/webservices/maps/"^_Uid);
 	declare SMap Map;
-	declare JsonSuccess = Map.fromjson(Private_ToCleanerJson(Result));
+	declare JsonSuccess = Map.fromjson(RegexFix::ToCleanerJson(Result));
 	return Map;
 }
 
 SZone[] Zones() {
 	declare Result = Http::SyncGET_Result("https://maniaplanet.com/webservices/zones");
 	declare SZone[] Zones;
-	declare JsonSuccess = Zones.fromjson(Private_ToCleanerJson(Result));
+	declare JsonSuccess = Zones.fromjson(RegexFix::ToCleanerJson(Result));
 	return Zones;
 }
 
@@ -241,14 +217,14 @@ STitle[] Titles() {
 STitle Title(Text _Uid) {
 	declare Result = Http::SyncGET_Result("https://maniaplanet.com/webservices/titles/"^_Uid);
 	declare STitle Title;
-	declare JsonSuccess = Title.fromjson(Private_ToCleanerJson(Result));
+	declare JsonSuccess = Title.fromjson(RegexFix::ToCleanerJson(Result));
 	return Title;
 }
 
 STitleScript[] TitleScripts(Text _Uid) {
 	declare Result = Http::SyncGET_Result("https://maniaplanet.com/webservices/titles/"^_Uid^"/scripts");
 	declare STitleScript[] Scripts;
-	declare JsonSuccess = Scripts.fromjson(Private_ToCleanerJson(Result));
+	declare JsonSuccess = Scripts.fromjson(RegexFix::ToCleanerJson(Result));
 	return Scripts;
 }
 
@@ -265,7 +241,7 @@ SOnlineServer[] Servers() {
 SFlashPost[] Flashes(Text _LiveUid, Integer _Offset, Integer _Length) {
 	declare Result = Http::SyncGET_Result("""https://maniaplanet.com/webservices/flashes/post/{{{_LiveUid}}}?offset={{{_Offset}}}&length={{{_Length}}}""");
 	declare SFlashPost[] Flashes;
-	declare JsonSuccess = Flashes.fromjson(Private_ToCleanerJson(Result));
+	declare JsonSuccess = Flashes.fromjson(RegexFix::ToCleanerJson(Result));
 	return Flashes;
 }
 
@@ -382,7 +358,7 @@ SPlayer GetAsyncMeResult(Text _Name) {
 	
 	if(AsyncIsCompleted(_Name, True)) {
 		if(AsyncIsSuccessful(_Name))
-			declare JsonSuccess = Result.fromjson(Private_ToCleanerJson(AsyncGetResult(_Name)));
+			declare JsonSuccess = Result.fromjson(RegexFix::ToCleanerJson(AsyncGetResult(_Name)));
 		AsyncDestroy(_Name);
 	}
 	return Result;
@@ -397,7 +373,7 @@ STitle[] GetAsyncMeTitlesCreatedResult(Text _Name) {
 	
 	if(AsyncIsCompleted(_Name, True)) {
 		if(AsyncIsSuccessful(_Name))
-			declare JsonSuccess = Result.fromjson(Private_ToCleanerJson(AsyncGetResult(_Name)));
+			declare JsonSuccess = Result.fromjson(RegexFix::ToCleanerJson(AsyncGetResult(_Name)));
 		AsyncDestroy(_Name);
 	}
 	return Result;
@@ -412,7 +388,7 @@ SDedicatedAccount[] GetAsyncMeDedicatedResult(Text _Name) {
 	
 	if(AsyncIsCompleted(_Name, True)) {
 		if(AsyncIsSuccessful(_Name))
-			declare JsonSuccess = Result.fromjson(Private_ToCleanerJson(AsyncGetResult(_Name)));
+			declare JsonSuccess = Result.fromjson(RegexFix::ToCleanerJson(AsyncGetResult(_Name)));
 		AsyncDestroy(_Name);
 	}
 	return Result;
@@ -427,7 +403,7 @@ SMap[] GetAsyncMeMapsResult(Text _Name) {
 	
 	if(AsyncIsCompleted(_Name, True)) {
 		if(AsyncIsSuccessful(_Name))
-			declare JsonSuccess = Result.fromjson(Private_ToCleanerJson(AsyncGetResult(_Name)));
+			declare JsonSuccess = Result.fromjson(RegexFix::ToCleanerJson(AsyncGetResult(_Name)));
 		AsyncDestroy(_Name);
 	}
 	return Result;
@@ -442,7 +418,7 @@ Text GetAsyncMeEmailResult(Text _Name) {
 	
 	if(AsyncIsCompleted(_Name, True)) {
 		if(AsyncIsSuccessful(_Name))
-			Result = AsyncGetResult(_Name));
+			Result = AsyncGetResult(_Name);
 		AsyncDestroy(_Name);
 	}
 	return Result;
@@ -457,7 +433,7 @@ SMap GetAsyncMapResult(Text _Name) {
 	
 	if(AsyncIsCompleted(_Name, True)) {
 		if(AsyncIsSuccessful(_Name))
-			declare JsonSuccess = Result.fromjson(Private_ToCleanerJson(AsyncGetResult(_Name)));
+			declare JsonSuccess = Result.fromjson(RegexFix::ToCleanerJson(AsyncGetResult(_Name)));
 		AsyncDestroy(_Name);
 	}
 	return Result;
@@ -472,7 +448,7 @@ SZone[] GetAsyncZonesResult(Text _Name) {
 	
 	if(AsyncIsCompleted(_Name, True)) {
 		if(AsyncIsSuccessful(_Name))
-			declare JsonSuccess = Result.fromjson(Private_ToCleanerJson(AsyncGetResult(_Name)));
+			declare JsonSuccess = Result.fromjson(RegexFix::ToCleanerJson(AsyncGetResult(_Name)));
 		AsyncDestroy(_Name);
 	}
 	return Result;
@@ -507,7 +483,7 @@ STitle GetAsyncTitleResult(Text _Name) {
 	
 	if(AsyncIsCompleted(_Name, True)) {
 		if(AsyncIsSuccessful(_Name))
-			declare JsonSuccess = Result.fromjson(Private_ToCleanerJson(AsyncGetResult(_Name)));
+			declare JsonSuccess = Result.fromjson(RegexFix::ToCleanerJson(AsyncGetResult(_Name)));
 		AsyncDestroy(_Name);
 	}
 	return Result;
@@ -522,7 +498,7 @@ STitleScript[] GetAsyncTitleScriptsResult(Text _Name) {
 	
 	if(AsyncIsCompleted(_Name, True)) {
 		if(AsyncIsSuccessful(_Name))
-			declare JsonSuccess = Result.fromjson(Private_ToCleanerJson(AsyncGetResult(_Name)));
+			declare JsonSuccess = Result.fromjson(RegexFix::ToCleanerJson(AsyncGetResult(_Name)));
 		AsyncDestroy(_Name);
 	}
 	return Result;
@@ -533,7 +509,7 @@ Boolean AsyncServers(Text _Name, SServerFilter _Filter) {
 }
 
 Boolean AsyncFlashes(Text _Name, Text _LiveUid, Integer _Offset, Integer _Length) {
-	return Http::AsyncGET("""https://maniaplanet.com/webservices/flashes/post/{{{_LiveUid}}}?offset={{{_Offset}}}&length={{{_Length}}}""");
+	return Http::AsyncGET(_Name, """https://maniaplanet.com/webservices/flashes/post/{{{_LiveUid}}}?offset={{{_Offset}}}&length={{{_Length}}}""");
 }
 
 Boolean AsyncFlashes(Text _Name, Text _LiveUid, Integer _Offset) {
@@ -549,7 +525,7 @@ SFlashPost[] GetAsyncFlashesResult(Text _Name) {
 	
 	if(AsyncIsCompleted(_Name, True)) {
 		if(AsyncIsSuccessful(_Name))
-			declare JsonSuccess = Result.fromjson(Private_ToCleanerJson(AsyncGetResult(_Name)));
+			declare JsonSuccess = Result.fromjson(RegexFix::ToCleanerJson(AsyncGetResult(_Name)));
 		AsyncDestroy(_Name);
 	}
 	return Result;

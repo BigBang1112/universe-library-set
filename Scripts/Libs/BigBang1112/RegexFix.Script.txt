@@ -45,3 +45,27 @@ Text RegexReplace(Text _Pattern, Text _Text, Text _Flags, Text _Replacement) {
 
 	return Final;
 }
+
+Text ToCleanerJson(Text _Json) {
+	declare Final = _Json;
+	declare AllKeys = TextLib::RegexFind("\"(.*?)\":(.*?)(,|})",_Json,"g");
+	foreach(Key,AllKeys) {
+		declare PatternPrecise = "\"([a-z])(.*?)\":(.*?)(,|})";
+		
+		declare MatchFirstLetter = TextLib::RegexMatch(PatternPrecise,Key,"");
+		declare FirstLetter = TextLib::ToUpperCase(MatchFirstLetter[1]);
+		
+		declare FixedRest = MatchFirstLetter[2];
+		declare FindInnerFirstLetters = TextLib::RegexFind("_([a-z])(.*?)",FixedRest,"g");
+		foreach(InnerFirstLetter, FindInnerFirstLetters) {
+			declare MatchInnerFirstLetters = TextLib::RegexMatch("_([a-z])(.*?)",InnerFirstLetter,"");
+			declare FirstInnerLetter = TextLib::ToUpperCase(MatchInnerFirstLetters[1]);
+			FixedRest = TextLib::Replace(FixedRest, InnerFirstLetter, RegexReplace("_([a-z])(.*?)", InnerFirstLetter, "g", FirstInnerLetter^"\\2"));
+		}
+		
+		declare Fixed = RegexReplace(PatternPrecise, Key, "g", "\"" ^ FirstLetter ^ FixedRest ^ "\":\\3\\4");
+		Final = TextLib::Replace(Final,Key,Fixed);
+	}
+	
+	return Final;
+}

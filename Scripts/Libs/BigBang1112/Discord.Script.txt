@@ -5,3 +5,154 @@
 
 // Wrapper for implicit Discord API access.
 */
+
+#Include "TextLib" as TextLib
+
+#Include "Libs/BigBang1112/Http.Script.txt" as Http
+#Include "Libs/BigBang1112/RegexFix.Script.txt" as RegexFix
+
+#Struct SChannel {
+	Integer Position;
+	Text Id;
+	Text Name;
+}
+
+#Struct SGame {
+	Text name;
+}
+
+#Struct SMember {
+	Text Username;
+	Text Status;
+	SGame Game;
+	Text AvatarUrl;
+	Text Avatar;
+	Text Discriminator;
+	Text Id;
+}
+
+#Struct SWidget {
+	SChannel[] Channels;
+	Text InstantInvite;
+	Text Id;
+	SMember[] Members;
+	Text Name;
+}
+
+SWidget Widget(Text _GuildUid) {
+	declare Result = Http::SyncGET_Result("""https://discordapp.com/api/guilds/{{{_GuildUid}}}/widget.json""");
+	declare SWidget Widget;
+	declare JsonSuccess = Widget.fromjson(RegexFix::ToCleanerJson(Result));
+	return Widget;
+}
+
+/*
+// CHttpRequest AsyncGet(Text _Name)
+// Gets asynchonous request, completed or pending.
+
+// Text _Name - Identification name
+
+// Returns request that can or cannot be in the progress
+*/
+CHttpRequest AsyncGet(Text _Name) {
+	return Http::Get(_Name);
+}
+
+/*
+// Void AsyncDestroy(Text _Name)
+// Destroys an aynchonous request.
+
+// Text _Name - Identification name
+*/
+Void AsyncDestroy(Text _Name) {
+	Http::Destroy(_Name);
+}
+
+/*
+// Boolean AsyncIsCompleted(Text _Name, Boolean _NoLog)
+// Checks if the asynchronous request was completed.
+
+// Text _Name - Identification name
+// Boolean _NoLog - If to not inform to the console
+
+// Returns True if the request is completed but not destroyed.
+*/
+Boolean AsyncIsCompleted(Text _Name, Boolean _NoLog) {
+	return Http::IsCompleted(_Name, _NoLog);
+}
+
+/*
+// Boolean AsyncIsCompleted(Text _Name)
+// Checks if the asynchronous request was completed.
+
+// Text _Name - Identification name
+
+// Returns True if the request is completed but not destroyed.
+*/
+Boolean AsyncIsCompleted(Text _Name) {
+	return AsyncIsCompleted(_Name, False);
+}
+
+/*
+// Boolean AsyncIsSuccessful(Text _Name)
+// Checks if the asynchonous request was completed successfully.
+
+// Text _Name - Identification name
+
+// Returns True if the request is completed with a positive response (between 200 inclusively and 300 exclusively HTTP code).
+*/
+Boolean AsyncIsSuccessful(Text _Name) {
+	return Http::IsSuccessful(_Name);
+}
+
+/*
+// Integer AsyncGetStatusCode(Text _Name, Boolean _NoLog)
+// Gets status code of the asynchronous request.
+
+// Text _Name - Identification name
+// Boolean _NoLog - If to not inform to the console
+
+// Returns status code number of a completed request, or 0 if the request is not completed or does not exist.
+*/
+Integer AsyncGetStatusCode(Text _Name, Boolean _NoLog) {
+	return Http::GetStatusCode(_Name, _NoLog);
+}
+
+/*
+// Integer AsyncGetStatusCode(Text _Name)
+// Gets status code of the asynchronous request.
+
+// Text _Name - Identification name
+
+// Returns status code number of a completed request, or 0 if the request is not completed or does not exist.
+*/
+Integer AsyncGetStatusCode(Text _Name) {
+	return AsyncGetStatusCode(_Name, False);
+}
+
+/*
+// Text AsyncGetResult(Text _Name)
+// Gets result of the asynchronous request.
+
+// Text _Name - Identification name
+
+// Returns result of a completed request, or empty string if the request is not completed or does not exist.
+*/
+Text AsyncGetResult(Text _Name) {
+	return Http::GetResult(_Name);
+}
+
+Boolean AsyncWidget(Text _Name, Text _GuildUid) {
+	return Http::AsyncGET(_Name, """https://discordapp.com/api/guilds/{{{_GuildUid}}}/widget.json""");
+}
+
+SWidget GetAsyncWidgetResult(Text _Name) {
+	declare SWidget Result;
+	
+	if(AsyncIsCompleted(_Name, True)) {
+		if(AsyncIsSuccessful(_Name))
+			declare JsonSuccess = Result.fromjson(RegexFix::ToCleanerJson(AsyncGetResult(_Name)));
+		AsyncDestroy(_Name);
+	}
+	return Result;
+}
