@@ -37,6 +37,8 @@
 	Text Id;
 	SMember[] Members;
 	Text Name;
+	Integer Code;
+	Text Message;
 }
 
 SWidget Widget(Text _GuildUid) {
