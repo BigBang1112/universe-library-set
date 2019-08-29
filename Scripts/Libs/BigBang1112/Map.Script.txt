@@ -91,22 +91,22 @@ SMapInfo ToSMapInfo(CMapInfo _MapInfo) {
 	return Info;
 }
 
-SMapInfo MapInfo(Text _Path, Integer _Scope) {
+SMapInfo MapInfo(Text _Path) {
 	declare Folders = TextLib::Split("/",_Path);
 	declare Removed = Folders.removekey(Folders.count-1);
 	declare Path = TextLib::Join("/",Folders);
 	
 	declare SMapInfo Info;
 
-	declare Result = Task::SyncMapList(DataFileMgr.Map_GetFilteredGameList(_Scope, Path, False));
+	declare Result = Task::SyncMapList(DataFileMgr.Map_GetGameList(Path, False));
 	foreach(MapInfo,Result.MapInfos)
 		if(MapInfo.FileName == _Path)
 			Info = ToSMapInfo(MapInfo);
 	return Info;
 }
 
-Boolean Exists(Text _Path, Integer _Scope) {
-	return MapInfo(_Path, _Scope).FileName != "";
+Boolean Exists(Text _Path) {
+	return MapInfo(_Path).FileName != "";
 }
 
 CTaskResult_MapList Get(Text _FileName) {
@@ -114,11 +114,11 @@ CTaskResult_MapList Get(Text _FileName) {
 	return G_AsyncMaps[_FileName];
 }
 
-Void AsyncMapInfo(Text _FileName, Integer _Scope) {
+Void AsyncMapInfo(Text _FileName) {
 	declare Folders = TextLib::Split("/",_FileName);
 	declare Removed = Folders.removekey(Folders.count-1);
 	declare Path = TextLib::Join("/",Folders);
-	G_AsyncMaps[_FileName] = DataFileMgr.Map_GetFilteredGameList(_Scope, Path, False);
+	G_AsyncMaps[_FileName] = DataFileMgr.Map_GetGameList(Path, False);
 }
 
 SMapInfo AsyncGet(Text _FileName) {
