@@ -129,8 +129,14 @@ Void SetAnimationOut(Text _LayerName, CUILayer::EUILayerAnimation _Animation) {
 
 Void SetAnimationInOut(Text _LayerName, CUILayer::EUILayerAnimation _Animation) {
 	declare Layer <=> Get(_LayerName);
-	if (Layer == Null) return;
+	if(Layer == Null) return;
 	Layer.InOutAnimation = _Animation;
+}
+
+CMlPage Page(Text _LayerName) {
+	declare Layer <=> Get(_LayerName);
+	if(Layer == Null) return Null;
+	return Layer.LocalPage;
 }
 
 Void Show(Text _LayerName, Boolean _ShowEvent) {
