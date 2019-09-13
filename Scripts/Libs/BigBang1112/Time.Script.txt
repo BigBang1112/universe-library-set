@@ -182,3 +182,11 @@ Real[] GetTimeOpacities() {
 	}
 	return Opacities;
 }
+
+Text TimeToTextWithMilli(Integer _Time) {
+	return TextLib::TimeToText(_Time, True)^TextLib::SubText(""^_Time, TextLib::Length(""^_Time)-1, 1);
+}
+
+Text TimeToFileNameSupportedText(Integer _Time) {
+	return TextLib::Replace(TextLib::Replace(TimeToTextWithMilli(_Time), ":", "'"), ".", "''");
+}
