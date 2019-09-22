@@ -178,6 +178,30 @@ Void SendEvent(Text _LayerName, Text _Type, Text _Data) {
 	LayerCustomEvent(Get(_LayerName), _Type, [_Data]);
 }
 
+Void SendEvent(Text _LayerName, Text _Type, Integer _Data) {
+	LayerCustomEvent(Get(_LayerName), _Type, [_Data^""]);
+}
+
+Void SendEvent(Text _LayerName, Text _Type, Real _Data) {
+	LayerCustomEvent(Get(_LayerName), _Type, [_Data^""]);
+}
+
+Void SendEvent(Text _LayerName, Text _Type, Ident _Data) {
+	LayerCustomEvent(Get(_LayerName), _Type, [_Data^""]);
+}
+
+Void SendEvent(Text _LayerName, Text _Type, Vec2 _Data) {
+	LayerCustomEvent(Get(_LayerName), _Type, [_Data^""]);
+}
+
+Void SendEvent(Text _LayerName, Text _Type, Vec3 _Data) {
+	LayerCustomEvent(Get(_LayerName), _Type, [_Data^""]);
+}
+
+Void SendEvent(Text _LayerName, Text _Type, Int3 _Data) {
+	LayerCustomEvent(Get(_LayerName), _Type, [_Data^""]);
+}
+
 Void SendEvent(Text _LayerName, Text _Type) {
 	LayerCustomEvent(Get(_LayerName), _Type, []);
 }
