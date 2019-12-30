@@ -92,7 +92,8 @@ SMapInfo ToSMapInfo(CMapInfo _MapInfo) {
 }
 
 SMapInfo FromFileName(Text _FileName) {
-	declare Folders = TextLib::Split("/",_FileName);
+	declare FileName = TextLib::Replace(_FileName, "\\", "/");
+	declare Folders = TextLib::Split("/", FileName);
 	declare Removed = Folders.removekey(Folders.count-1);
 	declare Path = TextLib::Join("/",Folders);
 	
@@ -100,7 +101,7 @@ SMapInfo FromFileName(Text _FileName) {
 
 	declare Result = Task::SyncMapList(DataFileMgr.Map_GetGameList(Path, False));
 	foreach(MapInfo,Result.MapInfos)
-		if(MapInfo.FileName == _FileName)
+		if(MapInfo.FileName == _FileName || MapInfo.FileName == FileName)
 			return ToSMapInfo(MapInfo);
 	return Info;
 }
