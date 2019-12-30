@@ -91,8 +91,8 @@ SMapInfo ToSMapInfo(CMapInfo _MapInfo) {
 	return Info;
 }
 
-SMapInfo MapInfo(Text _Path) {
-	declare Folders = TextLib::Split("/",_Path);
+SMapInfo FromFileName(Text _FileName) {
+	declare Folders = TextLib::Split("/",_FileName);
 	declare Removed = Folders.removekey(Folders.count-1);
 	declare Path = TextLib::Join("/",Folders);
 	
@@ -100,13 +100,22 @@ SMapInfo MapInfo(Text _Path) {
 
 	declare Result = Task::SyncMapList(DataFileMgr.Map_GetGameList(Path, False));
 	foreach(MapInfo,Result.MapInfos)
-		if(MapInfo.FileName == _Path)
-			Info = ToSMapInfo(MapInfo);
+		if(MapInfo.FileName == _FileName)
+			return ToSMapInfo(MapInfo);
 	return Info;
 }
 
-Boolean Exists(Text _Path) {
-	return MapInfo(_Path).FileName != "";
+SMapInfo FromUid(Text _MapUid) {
+	declare SMapInfo Info;
+	declare Result = Task::SyncMapList(DataFileMgr.Map_GetGameList("", True));
+	foreach(MapInfo in Result.MapInfos)
+		if(MapInfo.MapUid == _MapUid)
+			return ToSMapInfo(MapInfo);
+	return Info;
+}
+
+Boolean Exists(Text _FileName) {
+	return FromFileName(_FileName).FileName != "";
 }
 
 CTaskResult_MapList Get(Text _FileName) {
